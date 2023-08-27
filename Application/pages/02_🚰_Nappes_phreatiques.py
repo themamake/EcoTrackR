@@ -102,7 +102,9 @@ def get_piezometric_stations_in_bbox(bbox):
             "dep": x["nom_departement"],
             "commune": x["nom_commune"],
             "coordonnées": [x["x"], x["y"]]
-        } for x in contenu["data"] if datetime.datetime.strptime(x["date_fin_mesure"], "%Y-%m-%d") > datetime.datetime(year=2023, month=1, day=1)]
+        } for x in contenu["data"] if x["date_fin_mesure"] is not None and datetime.datetime.strptime(x["date_fin_mesure"], "%Y-%m-%d") > datetime.datetime(year=2023, month=1, day=1)]
+
+        #} for x in contenu["data"] if datetime.datetime.strptime(x["date_fin_mesure"], "%Y-%m-%d") > datetime.datetime(year=2023, month=1, day=1)]
 
         nbre_station = len(data)
         data.sort(key=lambda x: datetime.datetime.strptime(x["date_debut_mesure"], "%d-%m-%Y"))  # Tri des données
