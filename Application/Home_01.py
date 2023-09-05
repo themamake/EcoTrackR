@@ -75,7 +75,7 @@ def get_bbox_around_city(city, distance_km):
     if not city or city=="":
         st.info("Veuillez saisir le nom d'une ville dans la barre latérale.")
         return None
-    geolocator = Nominatim(user_agent="geoapiExercises")
+    geolocator = Nominatim(user_agent="home_01", timeout=10)
     location = geolocator.geocode(city)
     if not location:
         st.error("Impossible de trouver la localisation de la ville.")
@@ -136,7 +136,7 @@ def main( ):
     # Gestions des erreurs    
         if submit:
             try:  # Block pour capturer les erreurs
-                geolocator = Nominatim(user_agent="geoapiExercises")
+                geolocator = Nominatim(user_agent="home_01")
                 preliminary_location = geolocator.geocode(ville)
 
                 # Si la ville n'est pas trouvée
