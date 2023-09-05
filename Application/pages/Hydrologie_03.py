@@ -137,7 +137,7 @@ def plot_stations_on_map(stations,bbox,choix_station, ville):
     map_center = [center_lat, center_lon]
     my_map = folium.Map(location=map_center, zoom_start=10)#, width=1075, height=400)
 # Ajout du marqueur pour la ville recherchée
-    geolocator = Nominatim(user_agent="geoapiExercises")
+    geolocator = Nominatim(user_agent="home_01")
     location = geolocator.geocode(ville)
     if location:
         folium.Marker(location=[location.latitude, location.longitude], popup=ville, icon=folium.Icon(color='green'), sticky=True).add_to(my_map)
