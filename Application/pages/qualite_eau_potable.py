@@ -11,7 +11,7 @@ def fetch_data_from_api(ville):
     
     response_udi = requests.get(url_udi, params=params_udi)
     
-    if response_analysis.status_code in [200, 206] :
+    if response_udi.status_code != 200 :
         return None
 
     data_udi = response_udi.json()
