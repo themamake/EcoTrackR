@@ -215,6 +215,7 @@ def main():
             df = df[df["nom_param"].isin(parameters_to_keep)]  # Filtrer par les paramètres choisis
 
             # Check if "nom_param" column exists
+            st.info("""Ce graphique permet de visualiser la quantité de parametre chimique present dans la nappe en fonction du temps cela nous permets de visualiser une tendance au fil des années""")
             if "nom_param" in df.columns:
                 # Menu déroulant pour sélectionner un paramètre spécifique
                 params = list(df["nom_param"].unique())
