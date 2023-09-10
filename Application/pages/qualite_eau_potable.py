@@ -2,6 +2,62 @@ import streamlit as st
 import requests
 import pandas as pd
 
+#--------------------------------------------------Config Page--------------------------------------------------
+st.set_page_config(
+    initial_sidebar_state= "expanded" , 
+    page_title="Dashboard Hydrologique", 
+    page_icon="📊",
+    layout='centered')
+
+#--------------------------------------------------Police-------------------------------------------------------
+st.markdown("""
+    <style>
+        * {
+            font-family: Avenir Next, sans-serif !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
+#--------------------------------------------------background----------------------------------------------------   
+page_bg_img = f"""
+<style>
+[data-testid="stAppViewContainer"] > .main {{
+background-image: url("https://images.unsplash.com/photo-1524055988636-436cfa46e59e");
+background-size:60%;
+background-position: right;
+background-repeat: no-repeat;
+background-attachment: fixed;
+}}
+
+[data-testid="stSidebar"] > div:first-child {{
+background-color: #99b247;
+background-size:cover;
+background-position:center; 
+background-repeat: no-repeat;
+}}
+
+.main .block-container{{
+background-color: rgba(255, 255, 255, 0.95);  /* Fond blanc avec 95% d'opacité */
+border-radius: 10px; 
+padding: 2rem; 
+max-width: 100%;  /* Modification ici pour s'étendre sur toute la largeur */
+}}
+
+.stSidebar {{
+background-color: rgba(255, 255, 255, 0.95);  /* Fond blanc avec 95% d'opacité pour la barre latérale */
+}}
+
+[data-testid="stHeader"] {{
+background: rgba(0,0,0,0);
+}}
+
+[data-testid="stToolbar"] {{
+right: 2rem;
+}}
+</style>
+"""
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
 
 def fetch_data_from_api(ville):
     url_udi = "https://hubeau.eaufrance.fr/api/v1/qualite_eau_potable/communes_udi"
@@ -108,26 +164,23 @@ def transform_conformity_columns(df):
 
 def main():
     st.markdown("""<style>
-    table {
-        margin-left: auto;
-        margin-right: auto;
-    }
     table.dataframe {
-        border-collapse: collapse;
-        border-spacing: 10px;
-        width: 100%;
-        table-layout: auto;
-    }
-    table.dataframe th, table.dataframe td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: center;
-    }
-    table.dataframe th {
-        padding-top: 12px;
-        padding-bottom: 12px;
-        background-color: #f2f2f2;
-    }
+    border-collapse: collapse;
+    border-spacing: 10px;
+    width: 10%;
+    table-layout: auto;
+}
+table.dataframe th, table.dataframe td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+table.dataframe th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: #f2f2f2;
+    padding-left: 12px;
+}
 </style>
 """
 , unsafe_allow_html=True)
@@ -140,15 +193,23 @@ def main():
         df_analysis = transform_conformity_columns(df_analysis)
         
         # Affichage des données sous forme de tableau avec les pastilles de conformité
-        st.write("Informations sur les résultats d'analyses pour la ville sélectionnée (50 premières lignes) :")
-        st.markdown(df_analysis.head(50).to_html(escape=False), unsafe_allow_html=True)
+        st.write("Informations sur les résultats d'analyses pour la ville sélectionnée (5 premières lignes) :")
+        st.markdown(df_analysis.head(5).to_html(escape=False), unsafe_allow_html=True)
         
         # Affichage des légendes
         st.subheader("Légende")
         legend_html = (
             "<span title='Conforme' style='color: green;'>&#11044;</span> Conforme "
             "<span title='Intermédiaire' style='color: yellow;'>&#11044;</span> Intermédiaire "
-            "<span title='Non conforme' style='color: red;'>&#11044;</span> Non conforme"
+            "<span title='Non conforme' style='color: red;'>&#11044;</span> Non conforme <br> <br>"
+            "conformite_limites_bact_prelevement:  Conformité bactériologique du prélèvement aux limites de qualité en vigueur au moment du prélèvement pour le type d'eau considéré. Valeurs possibles : vide / C : conforme / N : non conforme / D : conforme dans le cadre d’une dérogation / S : sans objet : lorsqu'aucun paramètre du type considéré (bactériologique ou chimique) n'a été mesuré <br> <br>" 
+            "conformite_limites_pc_prelevement Conformité chimique du prélèvement aux limites de qualité en vigueur au moment du prélèvement pour le type d'eau considéré. Valeurs possibles : vide / C : conforme / N : non conforme / D : conforme dans le cadre d’une dérogation / S : sans objet : lorsqu'aucun paramètre du type considéré (bactériologique ou chimique) n'a été mesuré <br> <br> "
+            "conformite_references_bact_prelevement Conformité bactériologique du prélèvement aux références de qualité en vigueur au moment du prélèvement pour le type d'eau considéré. Valeurs possibles : vide / C : conforme / N : non conforme / D : conforme dans le cadre d’une dérogation / S : sans objet : lorsqu'aucun paramètre du type considéré (bactériologique ou chimique) n'a été mesuré <br> <br>"
+            "conformite_references_pc_prelevement Conformité chimique du prélèvement aux références de qualité en vigueur au moment du prélèvement pour le type d'eau considéré. Valeurs possibles : vide / C : conforme / N : non conforme / D : conforme dans le cadre d’une dérogation / S : sans objet : lorsqu'aucun paramètre du type considéré (bactériologique ou chimique) n'a été mesuré <br> <br>"
+        
+        
+        
+        
         )
         st.markdown(legend_html, unsafe_allow_html=True)
     else:
