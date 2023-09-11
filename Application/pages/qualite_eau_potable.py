@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import pandas as pd
+import matplotlib.pyplot as plt
 
 #--------------------------------------------------Config Page--------------------------------------------------
 st.set_page_config(
@@ -151,6 +152,19 @@ def conformity_to_html(value):
     }
     return mapping.get(value, value)
 
+def conformity_to_html2(value):
+    """
+    Convert conformity letters to colored pills (HTML span elements)
+    """
+    mapping = {
+        "C": "Conforme",
+        "N": "Non conforme",
+        "D": "conforme dans le cadre d’une dérogation",
+        "S": "sans objet",
+        "": "sans objet"  # for empty value
+    }
+    return mapping.get(value, value)
+
 def transform_conformity_columns(df):
     columns_to_transform = [
         'conformite_limites_bact_prelevement',
@@ -161,6 +175,36 @@ def transform_conformity_columns(df):
     for col in columns_to_transform:
         df[col] = df[col].apply(conformity_to_html)
     return df
+
+def transform_conformity_columns2(df):
+    columns_to_transform = [
+        'conformite_limites_bact_prelevement',
+        'conformite_limites_pc_prelevement',
+        'conformite_references_bact_prelevement',
+        'conformite_references_pc_prelevement'
+    ]
+    for col in columns_to_transform:
+        df[col] = df[col].apply(conformity_to_html2)
+    return df
+
+# Function to plot pie charts for the frequency of unique values in specified columns
+
+
+def plot_pie_charts_for_unique_values(df, columns):
+    for col in columns:
+        # Count the frequency of unique values in the column
+        value_counts = df[col].value_counts()
+        
+        # Plot pie chart
+        plt.figure(figsize=(3, 3))
+        plt.pie(value_counts, labels=value_counts.index, autopct='%1.1f%%', startangle=90, colors=['#ff9999','#66b3ff','#99ff99','#ffcc99'])
+        plt.title(f"Frequency of Unique Values in '{col}'")
+        plt.axis('equal')
+        
+        # Show the plot in Streamlit
+        st.pyplot(plt)
+        plt.clf()  # Clear the current figure for the next loop iteration
+
 
 def main():
     st.markdown("""<style>
@@ -187,11 +231,12 @@ table.dataframe th {
     st.title("Qualité de l'eau potable - Résultats d'Analyses")
     ville = st.session_state.get("ville", None)
     df_analysis = fetch_data_from_api(ville)
+    df_analysis2 = fetch_data_from_api(ville)
 
     if df_analysis is not None:
         # Ajout des pastilles de conformité au dataframe
         df_analysis = transform_conformity_columns(df_analysis)
-        
+        df_analysis2 = transform_conformity_columns2(df_analysis2)
         # Affichage des données sous forme de tableau avec les pastilles de conformité
         st.write("Informations sur les résultats d'analyses pour la ville sélectionnée (5 premières lignes) :")
         st.markdown(df_analysis.head(5).to_html(escape=False), unsafe_allow_html=True)
@@ -212,11 +257,35 @@ table.dataframe th {
         
         )
         st.markdown(legend_html, unsafe_allow_html=True)
+        def plot_pie_chart(column):
+            value_counts = df_analysis2[column].value_counts()
+            colors = ['green', 'red', 'yellow', 'grey']
+            plt.figure(figsize=(3,3))
+            plt.pie(value_counts, labels=value_counts.index, autopct='%1.1f%%', startangle=100,textprops={'fontsize': 2},colors=colors)
+            plt.title(f"Fréquence des valeurs uniques dans '{column}'", fontsize=3)
+            plt.axis('equal')  # Pour s'assurer que le diagramme est un cercle
+            st.pyplot(plt)
+
+        # Affichage des diagrammes en camembert dans Streamlit
+        fields = [
+            'conformite_limites_bact_prelevement',
+            'conformite_limites_pc_prelevement',
+            'conformite_references_bact_prelevement',
+            'conformite_references_pc_prelevement'
+        ]
+
+        for field in fields:
+            plot_pie_chart(field)
+        
     else:
         st.error(f"Erreur lors de la récupération des informations.")
 
+
+
 if __name__ == "__main__":
     main()
+
+
 
 
 

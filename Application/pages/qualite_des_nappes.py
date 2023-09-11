@@ -149,13 +149,6 @@ def stations_within_radius(stations, center_lat, center_lon, radius_km):
 
 
 
-
-
-
-
-
-
-
 def plot_stations_on_map(stations,bbox,choix_station, ville):
     """Fonction permettant la création de la carte centrée sur le centre de la boîte de géolocalisation """
     west = float(bbox[0])
@@ -187,10 +180,6 @@ def plot_stations_on_map(stations,bbox,choix_station, ville):
 #_______
 
 
-
-
-
-
 def main():
     st.title("Qualité des Nappes Souterraines")
     ville = st.session_state.get("ville", None)
@@ -204,18 +193,18 @@ def main():
         valid_stations = stations_within_radius(stations, latitude, longitude, rayon_km)
         choix_station = st.sidebar.radio("Choisissez une station :", [x["code_bss"] for x in valid_stations])
 
-        my_map = plot_stations_on_map(stations, bbox, choix_station,ville)
+        my_map = plot_stations_on_map(stations, bbox, choix_station, ville)
         folium_static(my_map)
-        # Si un point est sélectionné, affichez les analyses pour ce point
-        selected_station = st.selectbox("Sélectionnez une station:", [s["bss_id"] for s in stations])
-        analyses = fetch_analyses(selected_station)
+
+        # Utilisez choix_station pour obtenir les analyses
+        analyses = fetch_analyses(choix_station)
         
         if analyses:
             df = pd.DataFrame(analyses)
             df = df[df["nom_param"].isin(parameters_to_keep)]  # Filtrer par les paramètres choisis
 
             # Check if "nom_param" column exists
-            st.info("""Ce graphique permet de visualiser la quantité de parametre chimique present dans la nappe en fonction du temps cela nous permets de visualiser une tendance au fil des années""")
+            st.info("""Ce graphique permet de visualiser la quantité de paramètre chimique présent dans la nappe en fonction du temps. Cela nous permet de visualiser une tendance au fil des années.""")
             if "nom_param" in df.columns:
                 # Menu déroulant pour sélectionner un paramètre spécifique
                 params = list(df["nom_param"].unique())
@@ -232,3 +221,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
