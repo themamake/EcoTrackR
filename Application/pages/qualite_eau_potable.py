@@ -59,7 +59,7 @@ right: 2rem;
 """
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
-
+@st.cache_data
 def fetch_data_from_api(ville):
     url_udi = "https://hubeau.eaufrance.fr/api/v1/qualite_eau_potable/communes_udi"
     params_udi = {
@@ -219,12 +219,18 @@ table.dataframe th, table.dataframe td {
     padding: 8px;
     text-align: left;
 }
-table.dataframe th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    background-color: #f2f2f2;
-    padding-left: 12px;
+table.dataframe {
+    border-collapse: collapse;
+    border-spacing: 10px;
+    width: 100%;  /* ou une largeur fixe comme 600px */
+    height: 400px; /* hauteur fixe */
+    overflow: auto; /* afficher les barres de défilement si nécessaire */
+    display: block;
 }
+    .stChart {
+        max-width: 150px;  /* ou toute autre valeur que vous préférez */
+        margin: 0 auto;
+    }
 </style>
 """
 , unsafe_allow_html=True)
@@ -242,7 +248,7 @@ table.dataframe th {
         st.markdown(df_analysis.head(5).to_html(escape=False), unsafe_allow_html=True)
         
         # Affichage des légendes
-        st.subheader("Légende")
+        
         legend_html = (
             "<span title='Conforme' style='color: green;'>&#11044;</span> Conforme "
             "<span title='Intermédiaire' style='color: yellow;'>&#11044;</span> Intermédiaire "
@@ -256,27 +262,40 @@ table.dataframe th {
         
         
         )
-        st.markdown(legend_html, unsafe_allow_html=True)
+        
         def plot_pie_chart(column):
             value_counts = df_analysis2[column].value_counts()
             colors = ['green', 'red', 'yellow', 'grey']
-            plt.figure(figsize=(3,3))
-            plt.pie(value_counts, labels=value_counts.index, autopct='%1.1f%%', startangle=100,textprops={'fontsize': 2},colors=colors)
+            plt.figure(figsize=(0.5,0.5))
+            
+            plt.pie(value_counts, labels=value_counts.index, autopct='%1.1f%%', startangle=90,textprops={'fontsize': 3},colors=colors)
             plt.title(f"Fréquence des valeurs uniques dans '{column}'", fontsize=3)
             plt.axis('equal')  # Pour s'assurer que le diagramme est un cercle
             st.pyplot(plt)
 
         # Affichage des diagrammes en camembert dans Streamlit
         fields = [
-            'conformite_limites_bact_prelevement',
-            'conformite_limites_pc_prelevement',
-            'conformite_references_bact_prelevement',
-            'conformite_references_pc_prelevement'
-        ]
+        'conformite_limites_bact_prelevement',
+        'conformite_limites_pc_prelevement',
+        'conformite_references_bact_prelevement',
+        'conformite_references_pc_prelevement'
+    ]
 
-        for field in fields:
-            plot_pie_chart(field)
-        
+         # Première ligne de graphiques
+        col1, col2 = st.columns(2)
+        with col1:
+            plot_pie_chart(fields[0])
+        with col2:
+            plot_pie_chart(fields[1])
+
+        # Deuxième ligne de graphiques
+        col3, col4 = st.columns(2)
+        with col3:
+            plot_pie_chart(fields[2])
+        with col4:
+            plot_pie_chart(fields[3]) 
+        st.subheader("Légende")
+        st.markdown(legend_html, unsafe_allow_html=True)       
     else:
         st.error(f"Erreur lors de la récupération des informations.")
 
